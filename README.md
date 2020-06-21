@@ -62,4 +62,4 @@ airflow initdb
 ````
 vi airflow.cfg
 ````
-![img1](https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Darius_1.jpg)
+![img1](https://github.com/LinShien/Covid19-Analytics-With-Spark/blob/master/images/airflow_config.png)
