@@ -13,7 +13,7 @@ class sparkLoader(object):
     @classmethod
     def buildSparkSession(cls):
         global sparkSession
-        sparkSession = SparkSession.builder.config('spark.sql.warehouse.dir','file:///C:/temp').master('local[4]').appName("convid19Analytics").getOrCreate()
+        sparkSession = SparkSession.builder.config('spark.sql.warehouse.dir','file:///home/size7311/Covid19-Analytics-With-Spark').master('local[4]').appName("convid19Analytics").getOrCreate()
     
     @classmethod
     def loadFile(cls, filePath):
@@ -33,7 +33,7 @@ if __name__ == '__main__':
     sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
     
     sparkLoader.buildSparkSession()
-    covid19Dataset = sparkLoader.loadFile('C:\SparkCourse\data\COVID-19 Activity.csv')
+    covid19Dataset = sparkLoader.loadFile('/home/size7311/Covid19-Analytics-With-Spark/data/COVID-19 Activity.csv')
     transformedDataset = sparkLoader.transformDataset(covid19Dataset)
     
     transformedDataset.toPandas().to_csv('results.csv')
