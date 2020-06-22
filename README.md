@@ -7,12 +7,12 @@ Data source from https://data.world/covid-19-data-resource-hub/covid-19-case-cou
 ## Requirements
 * Ubuntu 18.04
 * Python 3.6 >= 
-* Apache Spark
-* Apache Airflow
+* Apache Spark 3.0.0
+* Apache Airflow 1.10.10
 * Python3-pip
 
 ***
-## Airflow Installation
+## 1.Airflow Installation
 #### Install Database for Airflow (default is sqlite)
 ````bash
 sudo apt-get install mysql-server
@@ -45,7 +45,7 @@ mkdir ~/airflow
 ````bash
 vi ~/.bashrc 
 ````
-###### Append the line below in .bashrc file
+###### Append the line below in .bashrc file and save
 ````shell
 export AIRFLOW_HOME=~/airflow  
 ````
@@ -63,3 +63,68 @@ airflow initdb
 vi airflow.cfg
 ````
 ![img1](https://github.com/LinShien/Covid19-Analytics-With-Spark/blob/master/images/airflow_config.png)
+##### Initialize Airflow with new configuartion 
+````airflow
+airflow initdb
+````
+##### Create folder for dags program
+````bash
+mkdir ~/airflow/dags
+````
+##### run Airflow Web UI and scheduler
+````Bash
+airflow webserver -p 8080
+````
+![img2](https://github.com/LinShien/Covid19-Analytics-With-Spark/blob/master/images/airflow_webUI.png)
+
+
+
+
+![img3](https://github.com/LinShien/Covid19-Analytics-With-Spark/blob/master/images/airflow_webUI2.png)
+
+
+
+
+Open another terminal
+````
+airflow scheduler
+````
+![img4](https://github.com/LinShien/Covid19-Analytics-With-Spark/blob/master/images/airflow_scheduler.png)
+
+## 2. Apache Spark Installation
+#### Download Apache Spark
+````Bash
+mkdir ~/download
+
+wget http://apache.stu.edu.tw/spark/spark-3.0.0/spark-3.0.0-bin-hadoop2.7.tgz
+tar zxvf spark-3.0.0-bin-hadoop2.7
+
+mv spark-3.0.0-bin-hadoop2.7 spark
+mv spark ~
+````
+#### Download JDK for Spark
+Download jdk https://www.oracle.com/tw/java/technologies/javase-downloads.html
+version 8 or 11 both compatible for Spark
+
+#### Install pyspark
+````Bash
+pip3 install pyspark
+````
+#### Add global variables
+````
+vi ~/.bashrc 
+````
+###### Append the line below in .bashrc file and save
+````
+export SPARK_HOME='/your home directory/spark/'
+export PYSPARK_PYTHON='/usr/bin/python3'
+export JAVA_HOME='/your home directory/name of your downloaded jdk'
+export PATH='$SPARK_HOME:PATH'
+export PATH='$PYSPARK_PYTHON:PATH'
+export PATH='$JAVA_HOME:PATH'
+````
+#### Now you are able to run pyspark now
+````Bash
+$>pyspark
+````
+![img5](https://github.com/LinShien/Covid19-Analytics-With-Spark/blob/master/images/pyspark.png)
