@@ -28,22 +28,13 @@ tearDown_command = '''
     cd ~/Covid19-Analytics-With-Spark/data
     rm -f "COVID-19 Activity.csv"
 '''
-    
-
-def readSparkResults(**context):
-    dataframe = pd.read_csv('/home/size7311/Covid19-Analytics-With-Spark/results.csv')
-
-    pd.set_option('display.max_rows', dataframe.shape[0] + 1)
-
-    print(dataframe)
-
 
 with DAG('dag_for_spark', catchup = False, default_args = default_args) as dag:
     downloadDataTask = BashOperator(
 	    task_id = 'download_data_task',
 	    bash_command = download_command + Variable.get('covid19_data_url')
 	    )
-    
+
     checkDataExists = FileSensor(
 	    task_id = 'check_data_task',
 	    filepath = '/home/size7311/Covid19-Analytics-With-Spark/data/COVID-19 Activity.csv',
@@ -55,17 +46,10 @@ with DAG('dag_for_spark', catchup = False, default_args = default_args) as dag:
             task_id = 'spark_task',
             bash_command = spark_command
             )
-    
-    pandasTask = PythonOperator(
-	    task_id = 'pandas_task',
-   	    python_callable = readSparkResults
-    )
 
     tearDownTask = BashOperator(
 	    task_id = 'tear_down_task',
 	    bash_command = tearDown_command
     )
 
-    downloadDataTask >> checkDataExists >> sparkTask >> pandasTask >> tearDownTask
-	    
-
+    downloadDataTask >> checkDataExists >> sparkTask >> tearDownTask
