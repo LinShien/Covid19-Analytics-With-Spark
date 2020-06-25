@@ -50,7 +50,8 @@ class Dashboard(object):
     @classmethod
     def textValueOnChart(self, axs, values):
         for idx, value in enumerate(values):
-            axs.text(idx, value, value, color = 'red', fontweight = 'bold')
+            axs.text(idx, value, value, color = 'red', horizontalalignment = 'center'
+                            , verticalalignment = 'baseline')
 
 def checkCmdArgs():
     if len(sys.argv) != 3:
