@@ -3,6 +3,8 @@ Use Apache Spark to analyze with covid 19 dataset
 
 Data source from https://data.world/covid-19-data-resource-hub/covid-19-case-counts
 
+
+![img6](https://github.com/LinShien/Covid19-Analytics-With-Spark/blob/master/images/Analytics_demo.png)
 ***
 ## Requirements
 * Ubuntu 18.04
