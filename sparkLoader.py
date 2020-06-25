@@ -9,21 +9,10 @@ from pyspark.sql.functions import to_date
 from pyspark.sql import functions
 import sys
 
-class sparkLoader(object):
-    sparkSession = None
-
-    @classmethod
-    def buildSparkSession(cls):
-        global sparkSession
-        sparkSession = SparkSession.builder.config('spark.sql.warehouse.dir','file:///home/size7311/Covid19-Analytics-With-Spark').master('local[4]').appName("convid19Analytics").getOrCreate()
-
-    @classmethod
-    def loadFile(cls, filePath):
-        return sparkSession.read.csv(filePath, header = True)
-
+class SparkDataExtractor(object):
     def extract(self, dataset):
-        datasetExtracted = self.filterUnusedColumns(dataset)
-        datasetCastedToNumeric = self.castColumnsAsType(datasetExtracted)
+        datasetExtracted = self.filterOutUnusedColumns(dataset)
+        datasetCastedToNumeric = self.castColumnsAsNumerics(datasetExtracted)
 
         datasetCastedToNumeric.cache()
 
@@ -33,7 +22,7 @@ class sparkLoader(object):
         return casesAndDeathPerCountry
 
     @classmethod
-    def filterUnusedColumns(cls, dataset):
+    def filterOutUnusedColumns(cls, dataset):
         return dataset.selectExpr('CONTINENT_NAME as CONTINENT'
                 , 'COUNTRY_SHORT_NAME as COUNTRY'
                 , 'PEOPLE_DEATH_NEW_COUNT'
@@ -41,19 +30,11 @@ class sparkLoader(object):
                 , 'REPORT_DATE')
 
     @classmethod
-    def castColumnsAsType(cls, dataset):
+    def castColumnsAsNumerics(cls, dataset):
         return dataset.select('COUNTRY'
-                , dataset.PEOPLE_DEATH_NEW_COUNT.cast('int').alias('DEATH_COUNT')
-                , dataset.PEOPLE_POSITIVE_NEW_CASES_COUNT.cast('int').alias('CASES_COUNT')
-                ,  to_date(dataset.REPORT_DATE, 'M/d/yyyy').alias('REPORT_DATE'))
-
-    @classmethod
-    def analyze(cls, dataset):
-        return dataset.groupBy('COUNTRY')       \
-                .sum('DEATH_COUNT', 'CASES_COUNT')      \
-                .withColumnRenamed('sum(DEATH_COUNT)', 'TOTAL_DEAHT')       \
-                .withColumnRenamed('sum(CASES_COUNT)', 'TOTAL_CASES')       \
-                .orderBy('sum(CASES_COUNT)', ascending = False)
+                                                    , dataset.PEOPLE_DEATH_NEW_COUNT.cast('int').alias('DEATH_COUNT')
+                                                    , dataset.PEOPLE_POSITIVE_NEW_CASES_COUNT.cast('int').alias('CASES_COUNT')
+                                                    ,  to_date(dataset.REPORT_DATE, 'M/d/yyyy').alias('REPORT_DATE'))
 
     def extractLatestReportDate(self, dataset):
         record = self.extractLatestReportDateFromTable(dataset)
@@ -63,12 +44,50 @@ class sparkLoader(object):
     def extractLatestReportDateFromTable(cls, dataset):
         return dataset.agg(functions.max(dataset.REPORT_DATE)).collect()
 
+    @classmethod
+    def analyze(cls, dataset):
+        return dataset      \
+                      .groupBy('COUNTRY')       \
+                      .sum('DEATH_COUNT', 'CASES_COUNT')      \
+                      .withColumnRenamed('sum(DEATH_COUNT)', 'TOTAL_DEAHT')       \
+                      .withColumnRenamed('sum(CASES_COUNT)', 'TOTAL_CASES')       \
+                      .orderBy('sum(CASES_COUNT)', ascending = False)
+
+class SparkLoader(object):
+    def __init__(self, extractor):
+        self.extractor = extractor
+        self.buildSparkSession()
+
+    def buildSparkSession(self):
+        self.sparkSession = SparkSession.builder        \
+                                        .config('spark.sql.warehouse.dir','file:///home/size7311/Covid19-Analytics-With-Spark')     \
+                                        .master('local[4]')     \
+                                        .appName("convid19Analytics")       \
+                                        .getOrCreate()      \
+
+    def runBatchJobWith(self, filePath):
+        covid19Dataset = self.loadFile(filePath)
+        analytics = self.extractor.extract(covid19Dataset)
+        self.saveAnalytics(analytics, self.extractor.latestReportDate)
+
+    def loadFile(self, filePath):
+        return self.sparkSession.read.csv(filePath, header = True)
+
+    @classmethod
+    def saveAnalytics(cls, analytics, date):
+        cls.saveAnalyticsAs(analytics, DateTransformer.transformDateToStr(date, '%Y-%m-%d'))
+
+    @classmethod
+    def saveAnalyticsAs(cls, analytics, fileName):
+        analytics.toPandas().to_csv('Analytics_' + fileName +  '.csv')
+
+class DateTransformer(object):
+    @classmethod
+    def transformDateToStr(cls, date, regex):
+        return date.strftime(regex)
+
 if __name__ == '__main__':
     sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
 
-    sparkLoader.buildSparkSession()
-
-    loader = sparkLoader()
-    covid19Dataset = sparkLoader.loadFile('/home/size7311/Covid19-Analytics-With-Spark/data/COVID-19 Activity.csv')
-    transformedDataset = loader.extract(covid19Dataset)
-    transformedDataset.toPandas().to_csv('Analytics_' + loader.latestReportDate.strftime('%m-%d-%Y') +  '.csv')
+    loader = SparkLoader(extractor = SparkDataExtractor())
+    loader.runBatchJobWith('/home/size7311/Covid19-Analytics-With-Spark/data/COVID-19 Activity.csv')
