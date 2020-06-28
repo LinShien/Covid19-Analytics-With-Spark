@@ -3,8 +3,8 @@ Use Apache Spark to analyze with covid 19 dataset
 
 Data source from https://data.world/covid-19-data-resource-hub/covid-19-case-counts
 
+<img src="https://github.com/LinShien/Covid19-Analytics-With-Spark/blob/master/images/Analytics_demo.png" width="1000" height="700">
 
-![img6](https://github.com/LinShien/Covid19-Analytics-With-Spark/blob/master/images/Analytics_demo.png)
 ***
 ## Requirements
 * Ubuntu 18.04
@@ -64,7 +64,9 @@ airflow initdb
 ````
 vi airflow.cfg
 ````
-![img1](https://github.com/LinShien/Covid19-Analytics-With-Spark/blob/master/images/airflow_config.png)
+
+<img src="https://github.com/LinShien/Covid19-Analytics-With-Spark/blob/master/images/airflow_config.png" width="750" height="300">
+
 ##### Initialize Airflow with new configuartion 
 ````airflow
 airflow initdb
@@ -73,25 +75,26 @@ airflow initdb
 ````bash
 mkdir ~/airflow/dags
 ````
-##### run Airflow Web UI and scheduler
+##### Run Airflow webserver
 ````Bash
 airflow webserver -p 8080
 ````
-![img2](https://github.com/LinShien/Covid19-Analytics-With-Spark/blob/master/images/airflow_webUI.png)
+<img src="https://github.com/LinShien/Covid19-Analytics-With-Spark/blob/master/images/airflow_webUI.png" width="750" height="300">
+
+##### Open your web browser and type the command below to view webserver UI
+````Bash
+localhost:8080
+````
+<img src="https://github.com/LinShien/Covid19-Analytics-With-Spark/blob/master/images/airflow_webUI2.png" width="750" height="300">
 
 
 
 
-![img3](https://github.com/LinShien/Covid19-Analytics-With-Spark/blob/master/images/airflow_webUI2.png)
-
-
-
-
-Open another terminal
+##### Open another terminal and type command below to oper scheduler
 ````
 airflow scheduler
 ````
-![img4](https://github.com/LinShien/Covid19-Analytics-With-Spark/blob/master/images/airflow_scheduler.png)
+<img src="https://github.com/LinShien/Covid19-Analytics-With-Spark/blob/master/images/airflow_scheduler.png" width="750" height="300">
 
 ## 2. Apache Spark Installation
 #### Download Apache Spark
@@ -129,4 +132,5 @@ export PATH='$JAVA_HOME:PATH'
 ````Bash
 $>pyspark
 ````
-![img5](https://github.com/LinShien/Covid19-Analytics-With-Spark/blob/master/images/pyspark.png)
+<img src="https://github.com/LinShien/Covid19-Analytics-With-Spark/blob/master/images/pyspark.png" width="750" height="300">
+
