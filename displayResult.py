@@ -83,7 +83,7 @@ def containsNoCharacterExceptNumber(str):
 if __name__ == '__main__':
     checkCmdArgs()
 
-    coordinates = CoordinatesForCovid19Analytics('/home/size7311/Covid19-Analytics-With-Spark/Analytics_' + sys.argv[2] + '.csv')
+    coordinates = CoordinatesForCovid19Analytics('./results/Analytics_' + sys.argv[2] + '.csv')
     coordinates.generateCoordinatesForTopNCountries(int(sys.argv[1]))
 
     dashboard = Dashboard(coordinates)

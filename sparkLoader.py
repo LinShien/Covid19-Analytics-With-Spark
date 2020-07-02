@@ -79,7 +79,7 @@ class SparkLoader(object):
 
     @classmethod
     def saveAnalyticsAs(cls, analytics, fileName):
-        analytics.toPandas().to_csv('Analytics_' + fileName +  '.csv')
+        analytics.toPandas().to_csv('./results/Analytics_' + fileName +  '.csv')
 
 class DateTransformer(object):
     @classmethod
@@ -90,4 +90,4 @@ if __name__ == '__main__':
     sys.stdout = open(sys.stdout.fileno(), mode='w', encoding='utf8', buffering=1)
 
     loader = SparkLoader(extractor = SparkDataExtractor())
-    loader.runBatchJobWith('/home/size7311/Covid19-Analytics-With-Spark/data/COVID-19 Activity.csv')
+    loader.runBatchJobWith('./data/COVID-19 Activity.csv')

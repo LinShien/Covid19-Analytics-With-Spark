@@ -24,11 +24,11 @@ spark_command = '''
     spark-submit sparkLoader.py
 '''
 
-tearDown_command = '''
+rawDataRename_command = '''
     cd ~/Covid19-Analytics-With-Spark/data
-    rm -f "COVID-19 Activity.csv"
+    mv "COVID-19 Activity.csv" "COVID-19 Activity-$(date +%Y-%m-%d).csv"
 '''
-
+    
 with DAG('dag_for_spark', catchup = False, default_args = default_args) as dag:
     downloadDataTask = BashOperator(
 	    task_id = 'download_data_task',
@@ -47,9 +47,9 @@ with DAG('dag_for_spark', catchup = False, default_args = default_args) as dag:
             bash_command = spark_command
             )
 
-    tearDownTask = BashOperator(
-	    task_id = 'tear_down_task',
-	    bash_command = tearDown_command
-    )
+    dataRenameTask = BashOperator(
+	    task_id = 'data_rename_task',
+	    bash_command = rawDataRename_command
+	    )
 
-    downloadDataTask >> checkDataExists >> sparkTask >> tearDownTask
+    downloadDataTask >> checkDataExists >> sparkTask >> dataRenameTask
